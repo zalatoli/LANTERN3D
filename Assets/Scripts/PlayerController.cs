@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour {
     public Vector3 moveDirection;
     public float gravityScale;
 
+    public Animator anim;
+
 	// Use this for initialization
 	void Start () {
         controller = GetComponent<CharacterController>();
@@ -40,6 +42,11 @@ public class PlayerController : MonoBehaviour {
                 moveDirection.y = terminalVelocity;
         }
         controller.Move(moveDirection * Time.deltaTime);
+
+        anim.SetBool("isGrounded", controller.isGrounded);
+        //Mathf.Abs is used to return a 1 or 0 depending on whether there is any input at all
+        //where normally the Get Axis functions return a range of values including negatives
+        anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
 
 
     }
