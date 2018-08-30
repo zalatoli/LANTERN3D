@@ -13,11 +13,16 @@ public class PlayerController : MonoBehaviour {
     public float gravityScale;
 
     public Animator anim;
+    //Pivot is used to controller player's forward direction irrespective
+    //of camera position
+    public Transform pivot;
+    public float rotateSpeed;
+    public GameObject playerModel;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         controller = GetComponent<CharacterController>();
-	}
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -42,6 +47,17 @@ public class PlayerController : MonoBehaviour {
                 moveDirection.y = terminalVelocity;
         }
         controller.Move(moveDirection * Time.deltaTime);
+
+        
+        //Move the player in different directions based on camera direction
+        //If the player is trying to move in a direction rotate them to the 
+        //pivot rotation
+        if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+        {
+            transform.rotation = Quaternion.Euler(0f, pivot.rotation.eulerAngles.y, 0f);
+            Quaternion newRotation = Quaternion.LookRotation(new Vector3(moveDirection.x, 0f, moveDirection.z));
+            playerModel.transform.rotation = Quaternion.Slerp(playerModel.transform.rotation, newRotation, rotateSpeed * Time.deltaTime);
+        }
 
         anim.SetBool("isGrounded", controller.isGrounded);
         //Mathf.Abs is used to return a 1 or 0 depending on whether there is any input at all

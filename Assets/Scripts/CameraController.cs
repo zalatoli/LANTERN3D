@@ -26,7 +26,10 @@ public class CameraController : MonoBehaviour {
             offset = target.position - transform.position;
 
         pivot.transform.position = target.transform.position;
-        pivot.transform.parent = target.transform;
+        //pivot.transform.parent = target.transform;
+        //Unparent from camera so the pivot doesn't move in relation to
+        //the camera, since the camera is already supposed to follow it
+        pivot.transform.parent = null;
 
         Cursor.lockState = CursorLockMode.Locked;
 	}
@@ -34,9 +37,11 @@ public class CameraController : MonoBehaviour {
 	// Update is called once per frame
     // LateUpdate is called at the end of each frame before the next
 	void LateUpdate () {
+
+        pivot.transform.position = target.transform.position;
         //Get x position of mouse & rotate the target object
         float horizontal = Input.GetAxis("Mouse X") * rotateSpeed;
-        target.Rotate(0, horizontal, 0);
+        pivot.Rotate(0, horizontal, 0);
 
         //Get Y position of mouse and rotate the pivot
         float vertical = Input.GetAxis("Mouse Y") * rotateSpeed;
@@ -46,20 +51,22 @@ public class CameraController : MonoBehaviour {
         else
             pivot.Rotate(-vertical, 0, 0);
 
+        //Move the camera based on the current rotation of the target 
+        //and the original offset
+        float desiredYAngle = pivot.eulerAngles.y;
+        float desiredXAngle = pivot.eulerAngles.x;
+
         //Limit the up/down camera rotation
-        if(pivot.rotation.eulerAngles.x > maxViewAngle && pivot.rotation.eulerAngles.x < 180f)
+        if (pivot.rotation.eulerAngles.x > maxViewAngle && pivot.rotation.eulerAngles.x < 180f)
         {
-            pivot.rotation = Quaternion.Euler(maxViewAngle, 0, 0);
+            pivot.rotation = Quaternion.Euler(maxViewAngle, desiredYAngle, 0);
         }
         if (pivot.rotation.eulerAngles.x > 180f && pivot.rotation.eulerAngles.x < 360f + minViewAngle)
         {
-            pivot.rotation = Quaternion.Euler(360f + minViewAngle, 0, 0);
+            pivot.rotation = Quaternion.Euler(360f + minViewAngle, desiredYAngle, 0);
         }
 
-        //Move the camera based on the current rotation of the target 
-        //and the original offset
-        float desiredYAngle = target.eulerAngles.y;
-        float desiredXAngle = pivot.eulerAngles.x;
+
 
         Quaternion rotation = Quaternion.Euler(desiredXAngle, desiredYAngle, 0);
         transform.position = target.position - (rotation * offset);
