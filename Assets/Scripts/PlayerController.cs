@@ -75,7 +75,7 @@ public class PlayerController : MonoBehaviour {
         //where normally the Get Axis functions return a range of values including negatives
         anim.SetFloat("Speed", (Mathf.Abs(Input.GetAxis("Vertical")) + Mathf.Abs(Input.GetAxis("Horizontal"))));
 
-
+        
     }
 
     public void Knockback(Vector3 direction)
